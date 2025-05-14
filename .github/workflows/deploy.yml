@@ -13,10 +13,19 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3  # Checks out the code in your repository
 
+    - name: Verify Docker and Minikube
+      run: |
+        docker --version
+        minikube version
+        minikube status
+
+
     - name: Set Docker to use Minikube's Docker daemon
       run: |
         echo "Configuring Docker to use Minikube's Docker daemon..."
-        & minikube -p minikube docker-env --shell=powershell | Invoke-Expression  # Configures Docker to use Minikube
+        Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
+        & minikube -p minikube docker-env --shell=powershell | Invoke-Expression
+
 
     - name: Build Backend Docker Image
       run: |
