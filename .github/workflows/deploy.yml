@@ -22,13 +22,14 @@ jobs:
     - name: Set Docker to use Minikube's Docker daemon
       shell: pwsh
       run: |
+        Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force  # Allow script execution
         echo "Configuring Docker to use Minikube's Docker daemon..."
-        Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
-        $env:DOCKER_TLS_VERIFY="1"
-        $env:DOCKER_HOST="tcp://127.0.0.1:55803"
-        $env:DOCKER_CERT_PATH="C:\Users\HP\.minikube\certs"
-        $env:MINIKUBE_ACTIVE_DOCKERD="minikube"
-        & minikube -p minikube docker-env --shell=pwsh | Invoke-Expression
+        $env:DOCKER_TLS_VERIFY="1"  # PowerShell equivalent of export
+        $env:DOCKER_HOST="tcp://127.0.0.1:55803"  # PowerShell equivalent of export
+        $env:DOCKER_CERT_PATH="C:\Users\HP\.minikube\certs"  # PowerShell equivalent of export
+        $env:MINIKUBE_ACTIVE_DOCKERD="minikube"  # PowerShell equivalent of export
+        & minikube -p minikube docker-env --shell=pwsh | Invoke-Expression  # Configure Docker for Minikube
+    
 
 
 
