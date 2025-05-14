@@ -19,12 +19,17 @@ jobs:
         minikube version
         minikube status
 
-
     - name: Set Docker to use Minikube's Docker daemon
+      shell: pwsh
       run: |
         echo "Configuring Docker to use Minikube's Docker daemon..."
         Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
-        & minikube -p minikube docker-env --shell=powershell | Invoke-Expression
+        $env:DOCKER_TLS_VERIFY="1"
+        $env:DOCKER_HOST="tcp://127.0.0.1:55803"
+        $env:DOCKER_CERT_PATH="C:\Users\HP\.minikube\certs"
+        $env:MINIKUBE_ACTIVE_DOCKERD="minikube"
+        & minikube -p minikube docker-env --shell=pwsh | Invoke-Expression
+
 
 
     - name: Build Backend Docker Image
