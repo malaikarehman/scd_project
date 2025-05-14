@@ -1,0 +1,43 @@
+name: Build and Deploy to Minikube
+
+on:
+  push:
+    branches:
+      - main  # This triggers the workflow when pushing to the `main` branch
+
+jobs:
+  build-deploy:
+    runs-on: self-hosted  # This ensures the job runs on the self-hosted runner
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3  # Checks out the code in your repository
+
+    - name: Set Docker to use Minikube's Docker daemon
+      run: |
+        echo "Configuring Docker to use Minikube's Docker daemon..."
+        & minikube -p minikube docker-env --shell=powershell | Invoke-Expression  # Configures Docker to use Minikube
+
+    - name: Build Backend Docker Image
+      run: |
+        docker build -t malaika1009/mern-backend:latest ./backend  # Builds the backend image
+
+    - name: Build Frontend Docker Image
+      run: |
+        docker build -t malaika1009/mern-frontend:latest ./frontend  # Builds the frontend image
+
+    - name: Login to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin  # Logs into Docker Hub using secrets
+
+    - name: Push Backend Image to Docker Hub
+      run: docker push malaika1009/mern-backend:latest  # Pushes the backend image to Docker Hub
+
+    - name: Push Frontend Image to Docker Hub
+      run: docker push malaika1009/mern-frontend:latest  # Pushes the frontend image to Docker Hub
+
+    - name: Deploy to Minikube
+      run: |
+        kubectl apply -f k8s/backend-deployment.yaml 
+        kubectl apply -f k8s/backend-service.yaml
+        kubectl apply -f k8s/frontend-deployment.yaml  
+        kubectl apply -f k8s/frontend-service.yaml
